@@ -1,0 +1,335 @@
+
+
+<html>
+	
+
+
+<head>
+
+ <!-- jQuery -->
+	<script  src="plugins/jquery/jquery.min.js"></script>
+  <script src="plugins/soundmanager/script/soundmanager2-jsmin.js"></script>
+	<link rel="stylesheet" href="plugins/bootstrap/css/bootstrap.min.css">
+   <link href="css/style.css" rel="stylesheet">
+
+</head>
+
+<!-- Custom CSS -->
+
+<script>
+var json={};
+$(function(){
+  var hash = window.location.hash.substr(1);
+  console.log(hash);
+if (hash){
+  $("#searchfield").val(hash);
+  doAjaxStuff();
+}
+  soundManager.setup({
+  // where to find flash audio SWFs, as needed
+  url: '/plugins/soundmanager/swf/',
+  onready: function() {
+    // SM2 is ready to play audio!
+    console.log("Ready to play!");
+  }
+});
+  $("#searchfield").keyup(function(event){
+ if(event.keyCode == 13){
+        doAjaxStuff();
+    }
+  });
+  
+addTextAreaCallback( document.getElementById("searchfield"), doAjaxStuff, 500 )
+
+
+});
+
+function doAjaxStuff(v){
+if (v){
+  $("#searchfield").val(v);
+
+}
+var filter=$("#searchfield").val();
+var JSONObject= {"query":filter, "type":"ie_to_en"};
+
+$.ajax({
+            type: 'post',
+            data: JSON.stringify(JSONObject),
+            dataType:"json",
+        
+            contentType: 'application/json',
+
+                    url: 'ie_to_en',            
+                    success: function(data) {
+                      $("#loading").hide();
+                       
+                            var p=$("<p class='suggestions'>");
+                            p.html("<b>Suggestions</b>");
+ 
+                            $(data["suggestions"]).each(function(){
+                              var keyword=this;
+                            
+                              p.append("<a class='sug' onclick='doAjaxStuff(\""+keyword+"\")'>"+keyword+"</a>");
+                            });
+                      if (data["results"].length==0){
+                         
+                        
+                          $("#dictionary").html("<p style='text-align:center; margin-left:auto; margin-right:auto;' class='lead'>Sorry, nothing found :(</p>").fadeIn();
+
+                            $("#dictionary").append(p);
+
+                         
+                      }else{
+                           $("#dictionary").html("<div class='sound'></div>");
+                 
+                        if (data["results"][0]["meaning"]){
+                           matchWord($("#searchfield").val(), $(data["results"][0]["meaning"]).html());
+                        }
+                        $.each(data["results"], function(i){
+                            if (this["meaning"]){
+                             
+                               $("#dictionary").append(p);
+                               $("#dictionary").append(generateDictOptionIrish(this, i+1)).slideUp;;
+                           
+                            }
+                            else{
+                              
+                            $("#dictionary").append(p);
+                            }
+                           
+                            
+                        })
+                      }
+
+                     
+                    },
+                    error: function(){
+                    $("#dictionary").html("<p class='lead'>Sorry, nothing found :(</p>");
+                      console.log("No response");
+                    }
+                });
+}
+
+function matchWord(irish, english){
+
+
+$.ajax({
+            type: 'post',
+            data: JSON.stringify({"query":english, "match":irish}),
+            dataType:"json",
+        
+            contentType: 'application/json',
+
+                    url: 'en_to_ie',            
+                    success: function(data) {
+                      $("#loading").hide();
+                      if (data.length==0){
+                      
+                         
+                      }else{
+                        console.log("Irish Sounds");
+                        console.dir(data);
+                      
+                        $("#dictionary .sound").html("<a onclick=\"playSound('"+data["munster"]+"', '"+data["connacht"]+"', '"+data["ulster"]+"')\"><span class='glyphicon glyphicon-volume-up'></span> "+data["irish"]+"</a>");
+                      }
+                     
+                    },
+                    error: function(){
+                  
+                    }
+                });
+}
+
+function addTextAreaCallback(textArea, callback, delay) {
+    var timer = null;
+    textArea.onkeyup = function() {
+        if (timer) {
+            window.clearTimeout(timer);
+        }
+        timer = window.setTimeout( function() {
+            timer = null;
+            callback();
+        }, delay );
+    };
+    textArea = null;
+}
+
+
+
+function playSound(munster, connacht, ulster){
+  console.log (munster + " " + connacht + " "+ulster);
+
+ if ($("[name='soundtype']:checked").val()=="munster"){
+    url=munster;
+ }
+ else if ($("[name='soundtype']:checked").val()=="connacht"){
+    url=connacht;
+ }
+else if ($("[name='soundtype']:checked").val()=="ulster"){
+    url=ulster;
+ }
+  console.log(" Chosen sound "+url);
+  console.log(" Selcted dialect "+$("[name='soundtype']:checked").val());
+  var mySound = soundManager.createSound({
+  url: url
+});
+
+mySound.play();
+
+
+}
+
+
+function generateDictOptionIrish(o, i){
+  var a=$("<a/>");
+  a.addClass("list-group-item");
+
+    var badge=$("<span/>");
+  badge.addClass("badge");
+  badge.html(o.word_type);
+
+  var h4=$("<h4/>");
+  h4.addClass("list-group-item-heading");
+  h4.append(i+". ");
+  h4.append(badge);
+  h4.append(o.meaning);
+
+  var examples_span=$("<span>");
+  examples_span.addClass("examples");
+  examples_span.html("View Examples");
+  //h4.append(examples_span);
+
+
+
+  var p=$("<p/>");
+
+  p.addClass("list-group-item-text");
+
+
+  var ul=$("<ul/>");
+  ul.addClass("translation-list");
+
+ 
+
+  var examples=$("<ul>");
+  examples.addClass("examples-list list-group-item");
+  $(o.examples).each(function(){
+      var li_example =$("<li/>");
+     li_example.addClass("list-group-item-text");
+     var ex_en=$("<span>");
+
+     ex_en.addClass("ex_en");
+     ex_en.html(this.irish);
+
+     var ex_ie=$("<span>");
+     ex_ie.addClass("ex_ie");
+     ex_ie.html("<i>"+this.english+"</i>");
+
+     li_example.append(ex_en);
+     li_example.append('<br/>');
+     li_example.append(ex_ie);
+
+
+     examples.append(li_example);
+   
+  })
+  
+ p.append(ul);
+ p.append(examples);
+
+  a.append(h4);
+  a.append(p);
+
+  return a;
+
+}
+
+
+
+</script>
+   
+
+
+	</head>
+<body>
+
+
+ <!-- Fixed navbar -->
+    <nav id ="mainnav" class="navbar navbar-default navbar-fixed-top">
+
+<div class="container">
+        <div class="navbar-header">
+         
+          <a class="navbar-brand" href="#">Gaeilge Translator <b>(BETA)</b></a>
+        </div>
+        <div id="navbar" class="collapse navbar-collapse">
+          <ul class="nav navbar-nav navbar-right">
+            <li class="active"><a href="index.html"><span class="glyphicon glyphicon-home"></span> Home</a></li>
+            <li><a href="about.html"><span class="glyphicon glyphicon-heart-empty"></span> About</a></li>
+     
+            <li><a href="https://github.com/kmmartell/Irish-Translator"><span class="glyphicon">
+              <img src="images/github-icon.png" style="height:20px;"/>
+
+            </span> GitHub</a></li>
+           
+          
+          </ul>
+        </div><!--/.nav-collapse -->
+      </div>
+    </nav>
+
+    <!-- Begin page content -->
+    <div class="container" >
+      <div style="width:100%; height:20px;"></div>
+     
+      <div style="width:800px; margin-left:auto; margin-right:auto;">
+
+      <p class="lead language" onclick='location.href="en_to_ie.html"' style="vertical-align:bottom">
+        <img src="images/irishflag.png" style="height:30px; padding-bottom:3px; margin-left:5px;"/> Irish 
+    
+        
+<span class="glyphicon glyphicon-arrow-left"></span><span class="glyphicon glyphicon-arrow-right"></span> <img src="images/canadaflag.png" style="height:28px;padding-bottom:3px; m"/>  English
+     
+        
+
+        
+
+      </p>
+      <div class="formkayla">
+     <input id="searchfield" class="form-kayla" placeholder='e.g. "How" ~ Only one word is supported'></input>
+     <div style="float:right;">
+<label class="checkbox-inline">
+  <input type="radio" id="inlineCheckbox1" name="soundtype" checked="checked" value="munster" > Munster
+</label>
+<label class="checkbox-inline">
+  <input type="radio" id="inlineCheckbox2" name="soundtype" value="connacht" > Connacht
+</label>
+<label class="checkbox-inline">
+  <input type="radio" id="inlineCheckbox3" name="soundtype" value="ulster" > Ulster
+</label>
+          </div>
+        </div>
+      </div>
+
+<div style="width:800px; margin-left:auto; margin-right:auto;margin-top:10px">
+    
+    
+      <div id="dictionary" class="list-group">
+
+</div>
+</div>
+    </div>
+    </div>
+
+    <footer class="footer">
+      <div class="container">
+        <p class="text-muted" style="margin-left:auto; margin-right:auto; width:300px; text-align:center;margin-top:5px;">Irish translations from <a href="http://www.teanglann.ie">Teanglann.ie</a>
+          <br/>Web application created by Kayla Martell.
+         </p>
+      </div>
+    </footer>
+
+
+</body>
+
+</html>

@@ -1,0 +1,104 @@
+/* style.css
+ * This file provides css styles.
+ */
+
+ .sug{margin-left:10px;}
+
+ .language:hover{cursor:pointer; }
+
+.suggestions{margin-left:auto; margin-right:auto; text-align:center; margin-top:20px; width:100%; height:30px;}
+
+ .form-control{box-shadow: inset 0 0 0 ;}
+
+select.form-kayla{border:solid 2px #E1E1E1; border-radius:0;font-size:18px; box-shadow:0; border-radius:0px; width:200px; height:30px; padding:5px;}
+
+.formkayla label{font-size:14px;}
+.formkayla input.form-kayla
+{font-size:12px; border:solid 2px #E1E1E1; border-radius:0;font-size:18px; width:100%; height:40px; padding:10px; }
+ .formkayla input.form-kayla:hover, .formkayla select.form-kayla:hover{box-shadow:0px 0px #fff; outline:none; transition: border-color .50s ease-in-out;
+   -moz-transition: border-color .50s ease-in-out;
+   -webkit-transition: border-color .50s ease-in-out;
+   border-color: #A1D6B7}
+
+   .formkayla select.form-kayla{height:40px;}
+.badge{margin-right:5px;}
+ .formkayla input.form-kayla:focus{box-shadow:0px 0px #fff; outline:none; transition: border-color .25s ease-in-out;
+   -moz-transition: border-color .25s ease-in-out;
+   -webkit-transition: border-color .25s ease-in-out;
+   border-color:#15994c;}
+
+ #searchfield{padding:10px; height:40px; font-size:20px;}
+
+ span.ex_en{margin-right:10px;}
+ span.ex_ie{color:#15994c;}
+
+.translation-list li{list-style-type:none;}
+.translation-list li.sound:hover{cursor:pointer;}
+span.nosound{margin-left:16px;}
+
+.sound{font-size:16px; height:30px;}
+.sound:hover{cursor:pointer;}
+
+
+
+
+.translation-list span{margin-right:5px;}
+
+ul.examples-list li{background:none;list-style-type: none;padding-top:10px; border-top:solid 1px #f1f1f1;}
+ul.examples-list {margin-left:20px;background:none;}
+
+
+ #mainnav {}
+
+ #mainnav .navbar-brand{}
+ .list-group-item{border:none;}
+
+ h4.list-group-item-heading{font-size:16px;}
+
+ .list-group-item:hover .examples{display:block;}
+
+span.examples{float:right; font-size:14px;  font-weight:400; display:none;}
+
+
+/* Sticky footer styles
+-------------------------------------------------- */
+html {
+  position: relative;
+  min-height: 100%;
+}
+body {
+  /* Margin bottom by footer height */
+  margin-bottom: 60px;
+}
+.footer {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  /* Set the fixed height of the footer here */
+  height: 60px;
+  background-color: #f5f5f5;
+
+}
+
+
+/* Custom page CSS
+-------------------------------------------------- */
+/* Not required for template or sticky footer method. */
+
+body > .container {
+  padding: 60px 15px 0;
+}
+.container .text-muted {
+  margin: 20px 0;
+}
+
+.footer > .container {
+  padding-right: 15px;
+  padding-left: 15px;
+}
+
+code {
+  font-size: 80%;
+}
+
+
